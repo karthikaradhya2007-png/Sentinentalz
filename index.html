@@ -419,7 +419,7 @@
     .main-content {
       max-width: 1440px;
       margin: 0 auto;
-      padding: 0 40px 100px;
+      padding: 0 40px 140px;
     }
 
     /* ════════════════════════════════════════════════════════════════
@@ -1167,11 +1167,11 @@
       </p>
 
       <div class="hero-cta-row">
-        <button class="btn btn-primary" onclick="document.getElementById('ops-panel').scrollIntoView({behavior:'smooth'})">
+        <button class="btn btn-primary" onclick="scrollToSection('#ops-panel')">
           <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" fill="currentColor"/><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.4"/></svg>
           Launch Operations Portal
         </button>
-        <button class="btn btn-ghost" onclick="document.getElementById('architecture').scrollIntoView({behavior:'smooth'})">
+        <button class="btn btn-ghost" onclick="scrollToSection('#architecture')">
           Explore s390x Architecture
         </button>
       </div>
@@ -1451,8 +1451,8 @@
       <p class="footer-brand">SentinelZ v1.0 · IBM Z Datathon 2026 · Theme 1: Real-Time AI · LinuxONE (s390x)</p>
       <nav class="footer-links">
         <a href="https://linuxone.cloud.marist.edu/" class="footer-link" target="_blank" rel="noopener">LinuxONE Cloud</a>
-        <a href="#ops-panel" class="footer-link">Operations</a>
-        <a href="#architecture" class="footer-link">Architecture</a>
+        <a href="#ops-panel" class="footer-link" onclick="event.preventDefault(); scrollToSection('#ops-panel')">Operations</a>
+        <a href="#architecture" class="footer-link" onclick="event.preventDefault(); scrollToSection('#architecture')">Architecture</a>
       </nav>
     </footer>
 
@@ -1666,6 +1666,15 @@
 
       console.log('✅ Lenis Smooth Scroll initialized successfully');
     }
+
+    function scrollToSection(target) {
+      if (typeof lenisInstance !== 'undefined' && lenisInstance) {
+        lenisInstance.scrollTo(target, { offset: -40, duration: 1.2 });
+      } else {
+        const el = document.querySelector(target);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   </script>
 
   <!-- ════════════════════════════════════════════════════════════════
@@ -1781,18 +1790,26 @@
           ease: 'power3.out',
         });
 
-        // Architecture Cards
+        // Architecture Cards - trigger as soon as section enters viewport
         gsap.from('.arch-card', {
           scrollTrigger: {
             trigger: '#architecture',
-            start: 'top 80%',
+            start: 'top 95%',
+            once: true,
           },
-          y: 60,
+          y: 40,
           opacity: 0,
-          stagger: 0.16,
-          duration: 0.9,
+          stagger: 0.14,
+          duration: 0.8,
           ease: 'power3.out',
+          clearProps: 'all'
         });
+
+        // Failsafe: Ensure cards are unconditionally visible after 800ms
+        setTimeout(() => {
+          gsap.set('.arch-card', { opacity: 1, y: 0, clearProps: 'all' });
+          if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+        }, 800);
 
       }
 
